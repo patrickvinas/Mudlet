@@ -183,7 +183,7 @@ else
   fi
 
   echo "=== Cloning installer project ==="
-  git clone https://github.com/Mudlet/installers.git "$GITHUB_WORKSPACE/installers"
+  git clone https://github.com/Mudlet/installers.git -b azure-cloud-signing "$GITHUB_WORKSPACE/installers"
   cd "$GITHUB_WORKSPACE/installers/windows" || exit 1
 
   echo "=== Installing Squirrel for Windows ==="
@@ -244,12 +244,18 @@ else
     exit 4
   fi
 
+  # sign Mudlet.exe
+  java -jar $GITHUB_WORKSPACE/installers/windows/jsign-7.0-SNAPSHOT.jar --storetype TRUSTEDSIGNING \
+      --keystore eus.codesigning.azure.net \
+      --storepass ${AZURE_ACCESS_TOKEN} \
+      --alias Mudlet/Mudlet \
+      $PACKAGE_DIR/Mudlet.exe
+
   # Execute Squirrel to create the installer
   ./squirrel.windows/tools/Squirrel --releasify "$nupkg_path" \
     --releaseDir "$GITHUB_WORKSPACE/squirreloutput" \
     --loadingGif "$GITHUB_WORKSPACE/installers/windows/splash-installing-2x.png" \
-    --no-msi --setupIcon "$InstallerIconFile" \
-    -n "/a /f $GITHUB_WORKSPACE/installers/windows/code-signing-certificate.p12 /p $WIN_SIGNING_PASS /fd sha256 /tr http://timestamp.digicert.com /td sha256"
+    --no-msi --setupIcon "$InstallerIconFile" 
 
   echo "=== Removing old directory content of release folder ==="
   rm -rf "${PACKAGE_DIR:?}/*"
@@ -257,6 +263,13 @@ else
   echo "=== Copying installer over ==="
   installerExePath="${PACKAGE_DIR}/Mudlet-$VERSION$MUDLET_VERSION_BUILD-$BUILD_COMMIT-windows-$BUILD_BITNESS.exe"
   mv "$GITHUB_WORKSPACE/squirreloutput/Setup.exe" "${installerExePath}"
+
+  # Sign the final installer
+  java -jar $GITHUB_WORKSPACE/installers/windows/jsign-7.0-SNAPSHOT.jar --storetype TRUSTEDSIGNING \
+      --keystore eus.codesigning.azure.net \
+      --storepass ${AZURE_ACCESS_TOKEN} \
+      --alias Mudlet/Mudlet \
+      $installerExePath
 
   # Check if the setup executable exists
   if [[ ! -f "$installerExePath" ]]; then
