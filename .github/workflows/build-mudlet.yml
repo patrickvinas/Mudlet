@@ -163,7 +163,7 @@ jobs:
         HOMEBREW_NO_INSTALL_CLEANUP: "ON"
       run: |
         # these aren't available or don't work well in vcpkg
-        BREWS=("libzzip" "libzip" "ccache" "luarocks" "expect" "mitchellh/gon/gon")
+        BREWS=("libzzip" "libzip" "ccache" "luarocks" "expect")
 
         # Loop through each brew package
         for brew in "${BREWS[@]}"; do
@@ -394,8 +394,9 @@ jobs:
         DBLSQD_PASS: ${{secrets.DBLSQD_PASS}}
         DEPLOY_KEY_PASS: ${{secrets.DEPLOY_KEY_PASS}}
         MACOS_SIGNING_PASS: ${{secrets.MACOS_SIGNING_PASS}}
-        AC_USERNAME: ${{secrets.APPLE_USERNAME}}
-        AC_PASSWORD: ${{secrets.APPLE_PASSWORD}}
+        APPLE_USERNAME: ${{secrets.APPLE_USERNAME}}
+        APPLE_PASSWORD: ${{secrets.APPLE_PASSWORD}}
+        APPLE_TEAM_ID: ${{secrets.APPLE_TEAM_ID}}
         TRIPLET: ${{matrix.triplet}}
 
     - name: Upload packaged Mudlet
