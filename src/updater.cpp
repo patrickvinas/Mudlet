@@ -495,8 +495,13 @@ QString Updater::getPreviousVersion() const
 }
 
 #if defined(Q_OS_WIN32)
+// we are trying to detect machines running a 32-Bit build of Mudlet on a 64-Bit Intel/AMD processor
 bool Updater::is64BitCompatible() const 
 {
+#if defined(Q_OS_WIN64)
+    return true;
+#endif
+
     BOOL isWow64 = FALSE;
     typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
     LPFN_ISWOW64PROCESS fnIsWow64Process = (LPFN_ISWOW64PROCESS)
