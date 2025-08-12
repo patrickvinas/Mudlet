@@ -564,6 +564,13 @@ dlgTriggerEditor::dlgTriggerEditor(Host* pH)
         mProfileSaveAsAction->setToolTip(disabledSaving);
     }
 
+    undoStack = new QUndoStack(this);
+    mProfileUndoAction = undoStack->createUndoAction(this, tr("Undo"));
+    mProfileUndoAction->setIcon(QIcon::fromTheme(qsl("edit-undo"), QIcon(qsl("/home/patrick/mudlet-data/profiles/paladin-solanari/mpt/redx.png"))));
+
+    mProfileRedoAction = undoStack->createRedoAction(this, tr("Redo"));
+    mProfileRedoAction->setIcon(QIcon::fromTheme(qsl("edit-redo"), QIcon(qsl("/home/patrick/mudlet-data/profiles/paladin-solanari/mpt/redx.png"))));
+
     auto *nextSectionShortcut = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab), this);
     QObject::connect(nextSectionShortcut, &QShortcut::activated, this, &dlgTriggerEditor::slot_nextSection);
 
@@ -598,6 +605,8 @@ dlgTriggerEditor::dlgTriggerEditor(Host* pH)
     toolBar->addAction(mpExportAction);
     toolBar->addAction(mProfileSaveAsAction);
     toolBar->addAction(mProfileSaveAction);
+    toolBar->addAction(mProfileUndoAction);
+    toolBar->addAction(mProfileRedoAction);
 
     connect(checkBox_displayAllVariables, &QAbstractButton::toggled, this, &dlgTriggerEditor::slot_toggleHiddenVariables);
 
@@ -2838,6 +2847,7 @@ void dlgTriggerEditor::delete_trigger()
     }
 
     if (pParent) {
+        undoStack->push(pParent->child(pItem));
         pParent->removeChild(pItem);
         mpCurrentTriggerItem = pParent;
         treeWidget_triggers->setCurrentItem(pParent);

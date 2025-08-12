@@ -54,6 +54,8 @@
 #include <QListWidgetItem>
 #include <QScrollArea>
 #include <QTreeWidget>
+#include <QUndoStack>
+#include <QUndoView>
 #include "post_guard.h"
 
 // Edbee editor includes
@@ -531,6 +533,8 @@ private:
     QList<dlgTriggerPatternEdit*> mTriggerPatternEdit;
     bool mChangingVar = false;
 
+    QUndoStack* undoStack = nullptr;
+
     QTextDocument* mpSourceEditorDocument = nullptr;
     edbee::TextEditorWidget* mpSourceEditorEdbee = nullptr;
     edbee::TextDocument* mpSourceEditorEdbeeDocument = nullptr;
@@ -558,6 +562,9 @@ private:
 
     QAction* mProfileSaveAction = nullptr;
     QAction* mProfileSaveAsAction = nullptr;
+
+    QAction* mProfileUndoAction = nullptr;
+    QAction* mProfileRedoAction = nullptr;
 
     // Enables the toolbars to be unhidden if they get hid:
     QAction* mpAction_restoreEditorActionsToolbar = nullptr;
